@@ -19,6 +19,7 @@ type Shape = [Position]
 type Row = Int
 type Column = Int
 type Cell = (Row, Column)
+type Shape' = [Cell]
 type Board = [Cell]
 
 q :: Shape
@@ -56,6 +57,24 @@ drawShape (r,c) (Up:xs) board = (r+1,c) : drawShape (r+1,c) xs board
 drawShape (r,c) (Down:xs) board = (r-1,c) : drawShape (r-1,c) xs board
 drawShape (r,c) (Left:xs) board = (r,c-1) : drawShape (r,c-1) xs board
 
+q' :: Cell -> Shape'
+q' (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+1,c)]
+
+
+drawShape' :: Cell -> Shape -> Board
+drawShape' cell@(r,c) shape =
+    sortNub $ map (\x -> case x of
+                 Start -> cell
+                 Right -> (r,c+1)
+                 Up -> (r+1,c+1)
+                 Left -> (r+1,c)
+                 otherwise -> (0,0)) shape
+{- drawShape' cell shape =  -}
+    {- foldl (\acc position -> case position of -}
+                 {- Start -> cell -}
+                 {- Right -> let (r,c) = last(acc) in (r,c+1) : acc -}
+          {- ) cell [] -}
+
 -- sorting tuple
 -- sortBy (comparing $ fst) . sortBy (comparing $ snd) $ a
 
@@ -68,6 +87,8 @@ main = hspec spec
 spec :: Spec
 spec =
     describe "Tetris Logic" $ do
+        it "can better position elements" $ do
+            drawShape' (0,0) q `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
         it "can position elements" $ do
             sortNub (drawShape (0,0) q []) `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
             sortNub (drawShape (0,0) i []) `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
