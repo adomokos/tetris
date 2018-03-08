@@ -39,6 +39,8 @@ j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 drawShape :: Ord b => t -> (t -> [b]) -> [b]
 drawShape cell shape = sort $ shape cell
 
+addShapeToBoard
+    :: Cell -> (Cell -> [Cell]) -> Board -> Board
 addShapeToBoard cell shape board =
     sortNub $ drawShape cell shape ++ board
 
@@ -60,3 +62,6 @@ spec =
             let board = addShapeToBoard (0,2) q $ addShapeToBoard (0,0) q []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
+            {- let board = addShapesToBoard [((0,2), q),((0,0), q)] [] -}
+            {- board `shouldBe` [(0,0), (0,1), (0,2), (0,3), -}
+                              {- (1,0), (1,1), (1,2), (1,3)] -}
