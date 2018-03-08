@@ -12,7 +12,6 @@ type Cell = (Row, Column)
 type Shape = [Cell]
 type Board = [Cell]
 
-
 sortNub :: (Ord a) => [a] -> [a]
 sortNub = map head . group . sort
 
@@ -40,12 +39,15 @@ j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 drawShape :: Ord b => t -> (t -> [b]) -> [b]
 drawShape cell shape = sort $ shape cell
 
+addShapeToBoard cell shape board =
+    sortNub $ drawShape cell shape ++ board
+
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec =
-    describe "Tetris Logic" $
+    describe "Tetris Logic" $ do
         it "can position elements" $ do
             drawShape (0,0) q `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
             drawShape (1,0) z `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
@@ -54,3 +56,7 @@ spec =
             drawShape (0,0) i `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
             drawShape (0,1) l `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
             drawShape (0,2) j `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
+        it "can position two blocks adjacent to each other" $ do
+            let board = addShapeToBoard (0,2) q $ addShapeToBoard (0,0) q []
+            board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
+                              (1,0), (1,1), (1,2), (1,3)]
