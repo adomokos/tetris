@@ -41,8 +41,11 @@ drawShape cell shape = sort $ shape cell
 
 addShapeToBoard
     :: Cell -> (Cell -> [Cell]) -> Board -> Board
-addShapeToBoard cell shape board =
-    sortNub $ drawShape cell shape ++ board
+addShapeToBoard cell@(r,c) shape board =
+    let result = sortNub $ drawShape cell shape ++ board
+     in if (length result `mod` 4 > 0)
+           then addShapeToBoard (r+1,c) shape board
+           else result
 
 main :: IO ()
 main = hspec spec
@@ -68,3 +71,12 @@ spec =
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (0,4), (0,5), (0,6), (0,7),
                               (0,8), (0,9), (1,8), (1,9)]
+        it "can position two block on top of each other" $ do
+            let board = addShapeToBoard (0,1) q $ addShapeToBoard (0,0) q []
+            board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
+                              (2,1), (2,2), (3,1), (3,2)]
+            let board = addShapeToBoard (0,1) i $ addShapeToBoard (0,0) i []
+            board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
+                              (1,1), (1,2), (1,3), (1,4)]
+
+
