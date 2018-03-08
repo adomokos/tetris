@@ -62,6 +62,9 @@ spec =
             let board = addShapeToBoard (0,2) q $ addShapeToBoard (0,0) q []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
-            {- let board = addShapesToBoard [((0,2), q),((0,0), q)] [] -}
-            {- board `shouldBe` [(0,0), (0,1), (0,2), (0,3), -}
-                              {- (1,0), (1,1), (1,2), (1,3)] -}
+            let board = addShapeToBoard (0,8) q $
+                        addShapeToBoard (0,4) i $
+                        addShapeToBoard (0,0) i []
+            board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
+                              (0,4), (0,5), (0,6), (0,7),
+                              (0,8), (0,9), (1,8), (1,9)]
