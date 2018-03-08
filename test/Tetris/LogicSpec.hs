@@ -2,7 +2,8 @@ module Tetris.LogicSpec where
 
 import Prelude hiding (Left, Right)
 import Test.Hspec
-import Data.Set
+import Data.List
+{- import Data.Set -}
 {- import qualified Tetris.Logic as L -}
 
 {-
@@ -44,6 +45,9 @@ j =[Start,Right,Up,Up]
 placeOnBoard :: Shape -> Column -> Board -> Board
 placeOnBoard shape column board = []
 
+sortNub :: (Ord a) => [a] -> [a]
+sortNub = map head . group . sort
+
 drawShape :: Cell -> Shape -> Board -> Board
 drawShape _ [] [] = []
 drawShape cell (Start:xs) board = cell : drawShape cell xs board
@@ -52,6 +56,12 @@ drawShape (r,c) (Up:xs) board = (r+1,c) : drawShape (r+1,c) xs board
 drawShape (r,c) (Down:xs) board = (r-1,c) : drawShape (r-1,c) xs board
 drawShape (r,c) (Left:xs) board = (r,c-1) : drawShape (r,c-1) xs board
 
+-- sorting tuple
+-- sortBy (comparing $ fst) . sortBy (comparing $ snd) $ a
+
+-- remove dupes
+-- map head . group . sort $ a
+
 main :: IO ()
 main = hspec spec
 
@@ -59,11 +69,11 @@ spec :: Spec
 spec =
     describe "Tetris Logic" $ do
         it "can position elements" $ do
-            drawShape (0,0) q [] `shouldBe` [(0,0), (0,1), (1,1), (1,0)]
-            drawShape (0,0) i [] `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
-            drawShape (0,3) i [] `shouldBe` [(0,3), (0,4), (0,5), (0,6)]
-            drawShape (1,0) t [] `shouldBe` [(1,0), (1,1), (0,1), (1,1), (1,2)]
-            drawShape (1,0) z [] `shouldBe` [(1,0), (1,1), (0,1), (0,2)]
-            drawShape (0,0) s [] `shouldBe` [(0,0), (0,1), (1,1), (1,2)]
-            drawShape (0,1) l [] `shouldBe` [(0,1), (0,2), (0,1), (1,1), (2,1)]
-            drawShape (0,2) j [] `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
+            sortNub (drawShape (0,0) q []) `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
+            sortNub (drawShape (0,0) i []) `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
+            sortNub (drawShape (0,3) i []) `shouldBe` [(0,3), (0,4), (0,5), (0,6)]
+            sortNub (drawShape (1,0) t []) `shouldBe` [(0,1), (1,0), (1,1), (1,2)]
+            sortNub (drawShape (1,0) z []) `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
+            sortNub (drawShape (0,0) s []) `shouldBe` [(0,0), (0,1), (1,1), (1,2)]
+            sortNub (drawShape (0,1) l []) `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
+            sortNub (drawShape (0,2) j []) `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
