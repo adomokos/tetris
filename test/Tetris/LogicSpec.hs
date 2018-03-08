@@ -38,7 +38,7 @@ j :: Cell -> Shape
 j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 
 drawShape :: Ord b => t -> (t -> [b]) -> [b]
-drawShape cell shape = sortNub $ shape cell
+drawShape cell shape = sort $ shape cell
 
 main :: IO ()
 main = hspec spec
