@@ -40,12 +40,23 @@ drawShape :: Ord b => t -> (t -> [b]) -> [b]
 drawShape cell shape = sort $ shape cell
 
 addShapeToBoard
-    :: Cell -> (Cell -> [Cell]) -> Board -> Board
+    :: Cell -> (Cell -> Shape) -> Board -> Board
+addShapeToBoard cell shape [] = drawShape cell shape ++ []
+addShapeToBoard (-1,c) shape board = drawShape (0, c) shape ++ board
 addShapeToBoard cell@(r,c) shape board =
-    let result = sortNub $ drawShape cell shape ++ board
-     in if (length result `mod` 4 > 0)
-           then addShapeToBoard (r+1,c) shape board
-           else result
+    let shapeCells = drawShape cell shape
+        overlappingCellCount = length (shapeCells `intersect` board)
+     in if overlappingCellCount == 0
+           then addShapeToBoard (r-1,c) shape board
+           else drawShape (r+1,c) shape ++ board
+
+placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
+placeShapeOnBoard c shape board =
+    sortNub $ addShapeToBoard (height board, c) shape board
+
+height :: Board -> Int
+height [] = 0
+height board = succ . fst . last $ board
 
 main :: IO ()
 main = hspec spec
@@ -61,26 +72,35 @@ spec =
             drawShape (0,0) i `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
             drawShape (0,1) l `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
             drawShape (0,2) j `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
+        it "can add one shape" $ do
+            let board = placeShapeOnBoard 0 q $ placeShapeOnBoard 0 q []
+            board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
+                              (2,0), (2,1), (3,0), (3,1)]
         it "can position two blocks adjacent to each other" $ do
-            let board = addShapeToBoard (0,2) q $ addShapeToBoard (0,0) q []
+            let board = placeShapeOnBoard 2 q $ placeShapeOnBoard 0 q []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
-            let board = addShapeToBoard (0,8) q $
-                        addShapeToBoard (0,4) i $
-                        addShapeToBoard (0,0) i []
+            let board = placeShapeOnBoard 8 q $
+                        placeShapeOnBoard 4 i $
+                        placeShapeOnBoard 0 i []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (0,4), (0,5), (0,6), (0,7),
                               (0,8), (0,9), (1,8), (1,9)]
         it "can position two block on top of each other" $ do
-            let board = addShapeToBoard (0,1) q $ addShapeToBoard (0,0) q []
+            let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
                               (2,1), (2,2), (3,1), (3,2)]
-            let board = addShapeToBoard (0,1) i $ addShapeToBoard (0,0) i []
+            let board = placeShapeOnBoard 1 i $ placeShapeOnBoard 0 i []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,1), (1,2), (1,3), (1,4)]
+        it "can tell the height of elements on board" $ do
+            let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
+            height board `shouldBe` 4
+
             -- T1,Z3,I4”
-            {- let board = addShapeToBoard (0,4) i $ -}
-                        {- addShapeToBoard (0,3) z $ -}
-                        {- addShapeToBoard (0,1) t [] -}
-            {- board `shouldBe` [(0,0), (0,1), (0,2), (0,3), -}
-                              {- (1,1), (1,2), (1,3), (1,4)] -}
+            let board = placeShapeOnBoard 4 i $
+                        placeShapeOnBoard 3 z $
+                        placeShapeOnBoard 1 t []
+            board `shouldBe` [(0,2), (1,1), (1,2), (1,3),
+                              (1,4), (1,5), (2,3), (2,4),
+                              (3,4), (3,5), (3,6), (3,7)]
