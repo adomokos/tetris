@@ -45,14 +45,21 @@ addShapeToBoard cell shape [] = drawShape cell shape ++ []
 addShapeToBoard (-1,c) shape board = drawShape (0, c) shape ++ board
 addShapeToBoard cell@(r,c) shape board =
     let shapeCells = drawShape cell shape
-        overlappingCells = length (shapeCells `intersect` board) == 0
+        overlappingCells = null (shapeCells `intersect` board)
      in if overlappingCells
            then addShapeToBoard (r-1,c) shape board
            else drawShape (r+1,c) shape ++ board
 
+collapseFullRows board =
+    let rows = groupBy (\r1 r2 -> fst r1 == fst r2) board
+        filteredRows = filter (\x -> length x /= 10) rows
+     in intercalate [] $ zipWith (\x y -> [(y,c) | (_,c) <- x]) filteredRows [0..]
+
 placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
 placeShapeOnBoard c shape board =
-    sortNub $ addShapeToBoard (height board, c) shape board
+    let updatedBoard = sortNub $ addShapeToBoard (height board, c) shape board
+     {- in intercalate [] $ filter (\x -> length x /= 10) $ groupBy (\a b -> fst a == fst b) updatedBoard -- Check what can be freed up here -}
+     in collapseFullRows updatedBoard
 
 height :: Board -> Int
 height [] = 0
@@ -80,12 +87,6 @@ spec =
             let board = placeShapeOnBoard 2 q $ placeShapeOnBoard 0 q []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
-            let board = placeShapeOnBoard 8 q $
-                        placeShapeOnBoard 4 i $
-                        placeShapeOnBoard 0 i []
-            board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
-                              (0,4), (0,5), (0,6), (0,7),
-                              (0,8), (0,9), (1,8), (1,9)]
         it "can position two block on top of each other" $ do
             let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
@@ -96,8 +97,7 @@ spec =
         it "can tell the height of elements on board" $ do
             let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
             height board `shouldBe` 4
-
-            -- T1,Z3,I4”
+            -- T1,Z3,I4 example
             let board = placeShapeOnBoard 4 i $
                         placeShapeOnBoard 3 z $
                         placeShapeOnBoard 1 t []
@@ -105,3 +105,9 @@ spec =
                               (1,4), (1,5), (2,3), (2,4),
                               (3,4), (3,5), (3,6), (3,7)]
             height board `shouldBe` 4
+        it "collapses rows after putting in new shapes" $ do
+            let board = placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 2 i $
+                        placeShapeOnBoard 0 q []
+            board `shouldBe` [(0,0), (0,1)]
+            height board `shouldBe` 1
