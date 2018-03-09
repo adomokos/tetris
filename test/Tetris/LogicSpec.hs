@@ -10,6 +10,7 @@ type Row = Int
 type Column = Int
 type Cell = (Row, Column)
 type Shape = [Cell]
+{- type Shape' = Cell Cell Cell Cell -}
 type Board = [Cell]
 
 q :: Cell -> Shape
@@ -36,17 +37,16 @@ j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 sortNub :: (Ord a) => [a] -> [a]
 sortNub = map head . group . sort
 
-drawShape :: Ord b => t -> (t -> [b]) -> [b]
+drawShape :: Cell -> (Cell -> Shape) -> Shape
 drawShape cell shape = sort $ shape cell
 
-addShapeToBoard
-    :: Cell -> (Cell -> Shape) -> Board -> Board
+addShapeToBoard :: Cell -> (Cell -> Shape) -> Board -> Board
 addShapeToBoard cell shape [] = drawShape cell shape ++ []
 addShapeToBoard (-1,c) shape board = drawShape (0, c) shape ++ board
 addShapeToBoard cell@(r,c) shape board =
     let shapeCells = drawShape cell shape
-        overlappingCellCount = length (shapeCells `intersect` board)
-     in if overlappingCellCount == 0
+        overlappingCells = length (shapeCells `intersect` board) == 0
+     in if overlappingCells
            then addShapeToBoard (r-1,c) shape board
            else drawShape (r+1,c) shape ++ board
 
@@ -104,3 +104,4 @@ spec =
             board `shouldBe` [(0,2), (1,1), (1,2), (1,3),
                               (1,4), (1,5), (2,3), (2,4),
                               (3,4), (3,5), (3,6), (3,7)]
+            height board `shouldBe` 4
