@@ -61,8 +61,8 @@ collapseFullRows =
         flatten = intercalate []
      in flatten . renumberRows . filterFullRows . formRows
 
-placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
-placeShapeOnBoard c shape =
+placeShapeOnBoard :: (Cell -> Shape) -> Column -> Board -> Board
+placeShapeOnBoard shape c =
     let updateBoard board = sortNub $ addShapeToBoard (height board, c) shape board
      in collapseFullRows . updateBoard
 
@@ -81,54 +81,54 @@ spec =
             drawShape (0,1) l `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
             drawShape (0,2) j `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
         it "can add one shape" $ do
-            let board = placeShapeOnBoard 0 q $ placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard q 0 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
                               (2,0), (2,1), (3,0), (3,1)]
         it "can position two blocks adjacent to each other" $ do
-            let board = placeShapeOnBoard 2 q $ placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard q 2 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
         it "can position two block on top of each other" $ do
-            let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard q 1 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
                               (2,1), (2,2), (3,1), (3,2)]
-            let board = placeShapeOnBoard 1 i $ placeShapeOnBoard 0 i []
+            let board = placeShapeOnBoard i 1 $ placeShapeOnBoard i 0 []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,1), (1,2), (1,3), (1,4)]
         it "can tell the height of elements on board" $ do
-            let board = placeShapeOnBoard 1 q $ placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard q 1 $ placeShapeOnBoard q 0 []
             height board `shouldBe` 4
             -- T1,Z3,I4 example
-            let board = placeShapeOnBoard 4 i $
-                        placeShapeOnBoard 3 z $
-                        placeShapeOnBoard 1 t []
+            let board = placeShapeOnBoard i 4 $
+                        placeShapeOnBoard z 3 $
+                        placeShapeOnBoard t 1 []
             board `shouldBe` [(0,2), (1,1), (1,2), (1,3),
                               (1,4), (1,5), (2,3), (2,4),
                               (3,4), (3,5), (3,6), (3,7)]
             height board `shouldBe` 4
         it "collapses rows after putting in new shapes" $ do
-            let board = placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 2 i $
-                        placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 2 $
+                        placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1)]
             height board `shouldBe` 1
-            let board = placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 2 i $
-                        placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 2 i $
-                        placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 2 $
+                        placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 2 $
+                        placeShapeOnBoard q 0 []
             board `shouldBe` []
             height board `shouldBe` 0
         it "collapses rows example" $ do
             -- Q0,I2,I6,I0,I6,I6,Q2,Q4
-            let board = placeShapeOnBoard 4 q $
-                        placeShapeOnBoard 2 q $
-                        placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 0 i $
-                        placeShapeOnBoard 6 i $
-                        placeShapeOnBoard 2 i $
-                        placeShapeOnBoard 0 q []
+            let board = placeShapeOnBoard q 4 $
+                        placeShapeOnBoard q 2 $
+                        placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 0 $
+                        placeShapeOnBoard i 6 $
+                        placeShapeOnBoard i 2 $
+                        placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0),(0,1),(0,4),(0,5),
                               (0,6),(0,7),(0,8),(0,9),
                               (1,2),(1,3),(2,2),(2,3)]
