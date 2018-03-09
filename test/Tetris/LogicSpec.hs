@@ -62,9 +62,9 @@ collapseFullRows =
      in flatten . renumberRows . filterFullRows . formRows
 
 placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
-placeShapeOnBoard c shape board =
-    let updatedBoard = sortNub $ addShapeToBoard (height board, c) shape board
-     in collapseFullRows updatedBoard
+placeShapeOnBoard c shape =
+    let updateBoard board = sortNub $ addShapeToBoard (height board, c) shape board
+     in collapseFullRows . updateBoard
 
 main :: IO ()
 main = hspec spec
