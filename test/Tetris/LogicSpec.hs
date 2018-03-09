@@ -37,6 +37,10 @@ j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 sortNub :: (Ord a) => [a] -> [a]
 sortNub = map head . group . sort
 
+height :: Board -> Int
+height [] = 0
+height board = succ . fst . last $ board
+
 drawShape :: Cell -> (Cell -> Shape) -> Shape
 drawShape cell shape = sort $ shape cell
 
@@ -58,12 +62,7 @@ collapseFullRows board =
 placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
 placeShapeOnBoard c shape board =
     let updatedBoard = sortNub $ addShapeToBoard (height board, c) shape board
-     {- in intercalate [] $ filter (\x -> length x /= 10) $ groupBy (\a b -> fst a == fst b) updatedBoard -- Check what can be freed up here -}
      in collapseFullRows updatedBoard
-
-height :: Board -> Int
-height [] = 0
-height board = succ . fst . last $ board
 
 main :: IO ()
 main = hspec spec
@@ -111,3 +110,10 @@ spec =
                         placeShapeOnBoard 0 q []
             board `shouldBe` [(0,0), (0,1)]
             height board `shouldBe` 1
+            let board = placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 2 i $
+                        placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 2 i $
+                        placeShapeOnBoard 0 q []
+            board `shouldBe` []
+            height board `shouldBe` 0
