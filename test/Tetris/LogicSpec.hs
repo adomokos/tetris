@@ -51,8 +51,8 @@ addShapeToBoard shape cell@(r,c) board =
     let shapeCells = drawShape shape cell
         noOverlappingCells = null (shapeCells `intersect` board)
      in if noOverlappingCells
-           then addShapeToBoard shape (r-1,c) board
-           else drawShape shape (r+1,c) ++ board
+        then addShapeToBoard shape (r-1,c) board
+        else drawShape shape (r+1,c) ++ board
 
 collapseFullRows :: Board -> Board
 collapseFullRows =
