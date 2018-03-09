@@ -39,20 +39,20 @@ sortNub = map head . group . sort
 
 height :: Board -> Int
 height [] = 0
-height board = succ . fst . last $ board
+height board = (succ . fst . last) board
 
-drawShape :: Cell -> (Cell -> Shape) -> Shape
-drawShape cell shape = sort $ shape cell
+drawShape :: (Cell -> Shape) -> Cell -> Shape
+drawShape shape = sort . shape
 
-addShapeToBoard :: Cell -> (Cell -> Shape) -> Board -> Board
-addShapeToBoard cell shape [] = drawShape cell shape ++ []
-addShapeToBoard (-1,c) shape board = drawShape (0, c) shape ++ board
-addShapeToBoard cell@(r,c) shape board =
-    let shapeCells = drawShape cell shape
-        overlappingCells = null (shapeCells `intersect` board)
-     in if overlappingCells
-           then addShapeToBoard (r-1,c) shape board
-           else drawShape (r+1,c) shape ++ board
+addShapeToBoard :: (Cell -> Shape) -> Cell -> Board -> Board
+addShapeToBoard shape cell [] = drawShape shape cell ++ []
+addShapeToBoard shape (-1,c) board = drawShape shape (0, c) ++ board
+addShapeToBoard shape cell@(r,c) board =
+    let shapeCells = drawShape shape cell
+        noOverlappingCells = null (shapeCells `intersect` board)
+     in if noOverlappingCells
+           then addShapeToBoard shape (r-1,c) board
+           else drawShape shape (r+1,c) ++ board
 
 collapseFullRows :: Board -> Board
 collapseFullRows =
@@ -64,7 +64,7 @@ collapseFullRows =
 
 placeShapeOnBoard :: (Cell -> Shape) -> Column -> Board -> Board
 placeShapeOnBoard shape c =
-    let updateBoard board = sortNub $ addShapeToBoard (height board, c) shape board
+    let updateBoard board = sortNub $ addShapeToBoard shape (height board, c) board
      in collapseFullRows . updateBoard
 
 main :: IO ()
@@ -74,13 +74,13 @@ spec :: Spec
 spec =
     describe "Tetris Logic" $ do
         it "can position elements" $ do
-            drawShape (0,0) q `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
-            drawShape (0,0) z `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
-            drawShape (0,0) s `shouldBe` [(0,0), (0,1), (1,1), (1,2)]
-            drawShape (0,0) t `shouldBe` [(0,1), (1,0), (1,1), (1,2)]
-            drawShape (0,0) i `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
-            drawShape (0,1) l `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
-            drawShape (0,2) j `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
+            drawShape q (0,0) `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
+            drawShape z (0,0) `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
+            drawShape s (0,0) `shouldBe` [(0,0), (0,1), (1,1), (1,2)]
+            drawShape t (0,0) `shouldBe` [(0,1), (1,0), (1,1), (1,2)]
+            drawShape i (0,0) `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
+            drawShape l (0,1) `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
+            drawShape j (0,2) `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
         it "can add one shape" $ do
             let board = placeShapeOnBoard q 0 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
