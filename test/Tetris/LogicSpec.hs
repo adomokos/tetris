@@ -12,20 +12,17 @@ type Cell = (Row, Column)
 type Shape = [Cell]
 type Board = [Cell]
 
-sortNub :: (Ord a) => [a] -> [a]
-sortNub = map head . group . sort
-
 q :: Cell -> Shape
 q (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+1,c)]
 
 z :: Cell -> Shape
-z (r,c) = [(r,c),(r,c+1),(r-1,c+1),(r-1,c+2)]
+z (r,c) = [(r+1,c),(r+1,c+1),(r,c+1),(r,c+2)]
 
 s :: Cell -> Shape
 s (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+1,c+2)]
 
 t :: Cell -> Shape
-t (r,c) = [(r,c),(r,c+1),(r,c+2),(r-1,c+1)]
+t (r,c) = [(r+1,c),(r+1,c+1),(r+1,c+2),(r,c+1)]
 
 i :: Cell -> Shape
 i (r,c) = [(r,c),(r,c+1),(r,c+2),(r,c+3)]
@@ -35,6 +32,9 @@ l (r,c) = [(r,c),(r,c+1),(r+1,c),(r+2,c)]
 
 j :: Cell -> Shape
 j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
+
+sortNub :: (Ord a) => [a] -> [a]
+sortNub = map head . group . sort
 
 drawShape :: Ord b => t -> (t -> [b]) -> [b]
 drawShape cell shape = sort $ shape cell
@@ -55,9 +55,9 @@ spec =
     describe "Tetris Logic" $ do
         it "can position elements" $ do
             drawShape (0,0) q `shouldBe` [(0,0), (0,1), (1,0), (1,1)]
-            drawShape (1,0) z `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
+            drawShape (0,0) z `shouldBe` [(0,1), (0,2), (1,0), (1,1)]
             drawShape (0,0) s `shouldBe` [(0,0), (0,1), (1,1), (1,2)]
-            drawShape (1,0) t `shouldBe` [(0,1), (1,0), (1,1), (1,2)]
+            drawShape (0,0) t `shouldBe` [(0,1), (1,0), (1,1), (1,2)]
             drawShape (0,0) i `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
             drawShape (0,1) l `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
             drawShape (0,2) j `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
@@ -78,5 +78,9 @@ spec =
             let board = addShapeToBoard (0,1) i $ addShapeToBoard (0,0) i []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,1), (1,2), (1,3), (1,4)]
-
-
+            -- T1,Z3,I4”
+            {- let board = addShapeToBoard (0,4) i $ -}
+                        {- addShapeToBoard (0,3) z $ -}
+                        {- addShapeToBoard (0,1) t [] -}
+            {- board `shouldBe` [(0,0), (0,1), (0,2), (0,3), -}
+                              {- (1,1), (1,2), (1,3), (1,4)] -}
