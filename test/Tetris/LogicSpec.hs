@@ -3,14 +3,12 @@ module Tetris.LogicSpec where
 import Prelude hiding (Left, Right)
 import Test.Hspec
 import Data.List
-{- import Data.Set -}
 {- import qualified Tetris.Logic as L -}
 
 type Row = Int
 type Column = Int
 type Cell = (Row, Column)
 type Shape = [Cell]
-{- type Shape' = Cell Cell Cell Cell -}
 type Board = [Cell]
 
 q :: Cell -> Shape
