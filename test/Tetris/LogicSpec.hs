@@ -54,10 +54,12 @@ addShapeToBoard cell@(r,c) shape board =
            then addShapeToBoard (r-1,c) shape board
            else drawShape (r+1,c) shape ++ board
 
-collapseFullRows board =
-    let rows = groupBy (\r1 r2 -> fst r1 == fst r2) board
-        filteredRows = filter (\x -> length x /= 10) rows
-     in intercalate [] $ zipWith (\x y -> [(y,c) | (_,c) <- x]) filteredRows [0..]
+collapseFullRows =
+    let formRows = groupBy (\r1 r2 -> fst r1 == fst r2)
+        filterFullRows = filter (\x -> length x /= 10)
+        renumberRows rows = zipWith (\x y -> [(y,c) | (_,c) <- x]) rows [0..]
+        flatten = intercalate []
+     in flatten . renumberRows . filterFullRows . formRows
 
 placeShapeOnBoard :: Column -> (Cell -> Shape) -> Board -> Board
 placeShapeOnBoard c shape board =
@@ -117,3 +119,17 @@ spec =
                         placeShapeOnBoard 0 q []
             board `shouldBe` []
             height board `shouldBe` 0
+        it "collapses rows example" $ do
+            -- Q0,I2,I6,I0,I6,I6,Q2,Q4
+            let board = placeShapeOnBoard 4 q $
+                        placeShapeOnBoard 2 q $
+                        placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 0 i $
+                        placeShapeOnBoard 6 i $
+                        placeShapeOnBoard 2 i $
+                        placeShapeOnBoard 0 q []
+            board `shouldBe` [(0,0),(0,1),(0,4),(0,5),
+                              (0,6),(0,7),(0,8),(0,9),
+                              (1,2),(1,3),(2,2),(2,3)]
+            height board `shouldBe` 3
