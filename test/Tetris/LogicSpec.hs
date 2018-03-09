@@ -54,6 +54,7 @@ addShapeToBoard cell@(r,c) shape board =
            then addShapeToBoard (r-1,c) shape board
            else drawShape (r+1,c) shape ++ board
 
+collapseFullRows :: Board -> Board
 collapseFullRows =
     let formRows = groupBy (\r1 r2 -> fst r1 == fst r2)
         filterFullRows = filter (\x -> length x /= 10)
