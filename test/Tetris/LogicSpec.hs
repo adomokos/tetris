@@ -11,36 +11,36 @@ import Data.Char
 type Row = Int
 type Column = Int
 type Cell = (Row, Column)
-type Shape = [Cell]
+type Shape = Cell -> [Cell]
 type Board = [Cell]
 
-q :: Cell -> Shape
+q :: Shape
 q (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+1,c)]
 
-z :: Cell -> Shape
+z :: Shape
 z (r,c) = [(r+1,c),(r+1,c+1),(r,c+1),(r,c+2)]
 
-s :: Cell -> Shape
+s :: Shape
 s (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+1,c+2)]
 
-t :: Cell -> Shape
+t :: Shape
 t (r,c) = [(r+1,c),(r+1,c+1),(r+1,c+2),(r,c+1)]
 
-i :: Cell -> Shape
+i :: Shape
 i (r,c) = [(r,c),(r,c+1),(r,c+2),(r,c+3)]
 
-l :: Cell -> Shape
+l :: Shape
 l (r,c) = [(r,c),(r,c+1),(r+1,c),(r+2,c)]
 
-j :: Cell -> Shape
+j :: Shape
 j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 
-charToShapeFn :: Char -> (Cell -> Shape)
+charToShapeFn :: Char -> Shape
 charToShapeFn c =
     M.fromList [('q',q),('z',z),('s',s),('t',t),
                 ('i',i),('l',l),('j',j)] M.! c
 
-parseInput :: String -> [(Cell -> Shape,Column)]
+parseInput :: String -> [(Shape,Column)]
 parseInput = map (\x -> ((charToShapeFn . toLower . head) x, read (tail x) :: Int))
                  . Split.splitOn ","
 
@@ -51,10 +51,10 @@ height :: Board -> Int
 height [] = 0
 height board = (succ . fst . last) board
 
-drawShape :: (Cell -> Shape) -> Cell -> Shape
+drawShape :: Shape -> Cell -> [Cell]
 drawShape shape = sort . shape
 
-addShapeToBoard :: (Cell -> Shape) -> Cell -> Board -> Board
+addShapeToBoard :: Shape -> Cell -> [Cell] -> Board
 addShapeToBoard shape cell [] = drawShape shape cell ++ []
 addShapeToBoard shape (-1,c) board = drawShape shape (0, c) ++ board
 addShapeToBoard shape cell@(r,c) board =
@@ -72,7 +72,7 @@ collapseFullRows =
         flatten = intercalate []
      in flatten . renumberRows . filterFullRows . formRows
 
-placeShapeOnBoard :: (Cell -> Shape) -> Column -> Board -> Board
+placeShapeOnBoard :: Shape -> Column -> [Cell] -> Board
 placeShapeOnBoard shape c =
     let updateBoard board = sortNub $ addShapeToBoard shape (height board, c) board
      in collapseFullRows . updateBoard
