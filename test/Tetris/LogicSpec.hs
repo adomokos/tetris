@@ -35,13 +35,13 @@ l (r,c) = [(r,c),(r,c+1),(r+1,c),(r+2,c)]
 j :: Shape
 j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
 
-charToShapeFn :: Char -> Shape
-charToShapeFn c =
+charToShape :: Char -> Shape
+charToShape c =
     M.fromList [('q',q),('z',z),('s',s),('t',t),
                 ('i',i),('l',l),('j',j)] M.! c
 
 parseInput :: String -> [(Shape,Column)]
-parseInput = map (\x -> ((charToShapeFn . toLower . head) x,
+parseInput = map (\x -> ((charToShape . toLower . head) x,
                           read (tail x) :: Int))
                  . Split.splitOn ","
 
