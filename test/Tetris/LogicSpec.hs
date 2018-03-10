@@ -41,7 +41,8 @@ charToShapeFn c =
                 ('i',i),('l',l),('j',j)] M.! c
 
 parseInput :: String -> [(Shape,Column)]
-parseInput = map (\x -> ((charToShapeFn . toLower . head) x, read (tail x) :: Int))
+parseInput = map (\x -> ((charToShapeFn . toLower . head) x,
+                          read (tail x) :: Int))
                  . Split.splitOn ","
 
 sortNub :: (Ord a) => [a] -> [a]
