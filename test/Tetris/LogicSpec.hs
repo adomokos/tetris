@@ -2,7 +2,10 @@ module Tetris.LogicSpec where
 
 import Prelude hiding (Left, Right)
 import Test.Hspec
+import qualified Data.Map as M
 import Data.List
+import qualified Data.List.Split as Split
+import Data.Char
 {- import qualified Tetris.Logic as L -}
 
 type Row = Int
@@ -31,6 +34,15 @@ l (r,c) = [(r,c),(r,c+1),(r+1,c),(r+2,c)]
 
 j :: Cell -> Shape
 j (r,c) = [(r,c),(r,c+1),(r+1,c+1),(r+2,c+1)]
+
+charToShapeFn :: Char -> (Cell -> Shape)
+charToShapeFn c =
+    M.fromList [('q',q),('z',z),('s',s),('t',t),
+                ('i',i),('l',l),('j',j)] M.! c
+
+parseInput :: String -> [(Cell -> Shape,Column)]
+parseInput = map (\x -> ((charToShapeFn . toLower . head) x, read (tail x) :: Int))
+                 . Split.splitOn ","
 
 sortNub :: (Ord a) => [a] -> [a]
 sortNub = map head . group . sort
@@ -132,3 +144,6 @@ spec =
                               (0,6),(0,7),(0,8),(0,9),
                               (1,2),(1,3),(2,2),(2,3)]
             height board `shouldBe` 3
+        it "parses string input into shapes and columns" $ do
+            let (s, c) = (head . parseInput) "Q0,Q1"
+            placeShapeOnBoard s c [] `shouldBe` [(0,0),(0,1),(1,0),(1,1)]

@@ -10,6 +10,8 @@ homepage: https://github.com/adomokos/tetris#readme
 
 dependencies:
   - base >= 4.7 && < 5
+  - split
+  - containers
 
 library:
   source-dirs: src/
