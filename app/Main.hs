@@ -1,8 +1,11 @@
 module Main where
 
 import Tetris.Logic
+import Data.List
 
 main :: IO ()
 main = do
-    let board = populateBoard "Q0,Q2"
-    putStrLn $ show board
+    input <- getContents
+    let positions =  lines input
+        result = map (height . populateBoard) positions
+    putStrLn $ intercalate ("\n") (map (show) result)
