@@ -151,3 +151,4 @@ spec =
                               (parseInput "Q0,Q1")
             board `shouldBe` [(0,0),(0,1),(1,0),(1,1),
                               (2,1),(2,2),(3,1),(3,2)]
+            height board `shouldBe` 4
