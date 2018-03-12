@@ -6,7 +6,6 @@ module Tetris.Logic
        parseInput, populateBoard
     ) where
 
-import Prelude hiding (Left, Right)
 import qualified Data.Map as M
 import Data.List
 import qualified Data.List.Split as Split
@@ -84,6 +83,6 @@ placeShapeOnBoard shape c =
 
 populateBoard :: String -> Board
 populateBoard input =
-    foldl (\acc (s,c) -> placeShapeOnBoard s c acc)
+    foldl (\acc (shape, c) -> placeShapeOnBoard shape c acc)
           []
           (parseInput input)
