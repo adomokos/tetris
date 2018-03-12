@@ -3,4 +3,4 @@ module Main where
 import Tetris.Logic
 
 main :: IO ()
-main = putStrLn someFunc
+main = putStrLn "hello"
