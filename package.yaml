@@ -6,7 +6,7 @@ copyright: 2018 Attila Domokos
 category: Console App
 homepage: https://github.com/adomokos/tetris#readme
 
-# ghc-options: -Wall
+ghc-options: -Wall
 
 dependencies:
   - base >= 4.7 && < 5
