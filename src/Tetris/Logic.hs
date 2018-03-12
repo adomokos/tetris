@@ -3,7 +3,7 @@ module Tetris.Logic
        Row, Column, Cell, Shape, Board,
        q, z, s, t, i, l, j,
        drawShape, placeShapeOnBoard, height,
-       parseInput
+       parseInput, populateBoard
     ) where
 
 import Prelude hiding (Left, Right)
@@ -81,3 +81,9 @@ placeShapeOnBoard :: Shape -> Column -> [Cell] -> Board
 placeShapeOnBoard shape c =
     let updateBoard board = sortNub $ addShapeToBoard shape (height board, c) board
      in collapseFullRows . updateBoard
+
+populateBoard :: String -> Board
+populateBoard input =
+    foldl (\acc (s,c) -> placeShapeOnBoard s c acc)
+          []
+          (parseInput input)

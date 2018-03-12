@@ -71,9 +71,7 @@ spec =
                               (1,2),(1,3),(2,2),(2,3)]
             height board `shouldBe` 3
         it "parses string input into shapes and columns" $ do
-            let board = foldl (\acc (s,c) -> placeShapeOnBoard s c acc)
-                              []
-                              (parseInput "Q0,Q1")
+            let board = populateBoard "Q0,Q1"
             board `shouldBe` [(0,0),(0,1),(1,0),(1,1),
                               (2,1),(2,2),(3,1),(3,2)]
             height board `shouldBe` 4
