@@ -17,7 +17,7 @@ spec =
             drawShape i (0,0) `shouldBe` [(0,0), (0,1), (0,2), (0,3)]
             drawShape l (0,1) `shouldBe` [(0,1), (0,2), (1,1), (2,1)]
             drawShape j (0,2) `shouldBe` [(0,2), (0,3), (1,3), (2,3)]
-        it "can add one shape" $ do
+        it "can position two blocks on top of each other" $ do
             let board = placeShapeOnBoard q 0 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
                               (2,0), (2,1), (3,0), (3,1)]
@@ -25,7 +25,7 @@ spec =
             let board = placeShapeOnBoard q 2 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (0,2), (0,3),
                               (1,0), (1,1), (1,2), (1,3)]
-        it "can position two block on top of each other" $ do
+        it "can position two shapes on top of each other - sligtly off" $ do
             let board = placeShapeOnBoard q 1 $ placeShapeOnBoard q 0 []
             board `shouldBe` [(0,0), (0,1), (1,0), (1,1),
                               (2,1), (2,2), (3,1), (3,2)]
